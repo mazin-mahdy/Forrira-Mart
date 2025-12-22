@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forrira Admin Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .center-box { max-width:420px; margin:90px auto; background:white; padding:22px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.08); text-align:center; }
+    .center-box input { width:92%; margin:8px 0; padding:12px; border-radius:10px; border:1px solid #ddd; font-size:16px; }
+    .center-box button { width:95%; padding:12px; margin-top:10px; background:#ff6b6b; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="center-box">
+    <h2>Forrira Admin</h2>
+    <p>Enter admin password</p>
+    <input id="adminPass" type="password" placeholder="Password" />
+    <button onclick="adminLogin()">Login</button>
+    <p id="err" style="display:none;color:#c33;margin-top:8px;">Wrong password</p>
+    <p style="margin-top:8px;"><a href="login.html">Back to Entry</a></p>
+  </div>
+
+  <script>
+    function adminLogin() {
+      const pass = document.getElementById('adminPass').value.trim();
+      if (pass === '12521232') {
+        localStorage.setItem('adminLogged','true');
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('err').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

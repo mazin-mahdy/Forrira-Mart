@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forrira Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-wrap { max-width:1000px; margin:28px auto; padding:20px; background:white; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
+    .admin-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .admin-controls button { margin-left:8px; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
+    .orders-list { margin-top:18px; }
+    .order-card { border:1px solid #eee; padding:12px; border-radius:10px; margin-bottom:12px; background:#fbfbfb; }
+    .order-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+    .order-actions button { margin-left:8px; padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+    .process { background:#00b894; color:white; }
+    .del { background:#ff7675; color:white; }
+    .msg-btn { background:#1e90ff; color:white; }
+    .small-input { padding:8px; border:1px solid #ddd; border-radius:8px; width:220px; }
+  </style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <h1>🧾 Forrira Admin</h1>
+      <div>
+        <button class="open" onclick="openShop()" style="background:#28a745;color:white;">🟢 Open</button>
+        <button class="close" onclick="closeShop()" style="background:#dc3545;color:white;">🔴 Close</button>
+        <button class="logout" onclick="logout()" style="background:#6c757d;color:white;">Logout</button>
+      </div>
+    </div>
+
+    <p id="shopState" style="font-weight:700;margin-top:10px;"></p>
+
+    <h2 style="margin-top:18px;">Customer Orders</h2>
+    <div style="margin-bottom:10px;">
+      <small>Search by name / villa:</small>
+      <input id="searchAdmin" class="small-input" placeholder="Search name or villa" oninput="renderOrdersForAdmin()" />
+    </div>
+    <div class="orders-list" id="ordersList"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if (localStorage.getItem('adminLogged') !== 'true') window.location.href = 'admin-login.html';
+
+    function updateShopStateText() {
+      const isOpen = localStorage.getItem('isOpen') === 'true';
+      document.getElementById('shopState').textContent = isOpen ? '✅ Shop is OPEN' : '❌ Shop is CLOSED';
+    }
+
+    function openShop() { localStorage.setItem('isOpen','true'); updateShopStateText(); alert('Shop opened'); }
+    function closeShop() { localStorage.setItem('isOpen','false'); updateShopStateText(); alert('Shop closed'); }
+    function logout() { localStorage.removeItem('adminLogged'); window.location.href = 'admin-login.html'; }
+
+    // Render orders
+    function renderOrdersForAdmin() {
+      const q = (document.getElementById('searchAdmin').value || '').toLowerCase();
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]').slice().reverse();
+      const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const list = document.getElementById('ordersList');
+      list.innerHTML = '';
+      if (!orders.length) { list.innerHTML = '<p style="color:#666">No orders yet.</p>'; return; }
+
+      orders.forEach((order, rIdx) => {
+        const realIdx = allOrders.length - 1 - rIdx;
+        // search filter
+        if (q && !(order.customerName.toLowerCase().includes(q) || String(order.customerVilla).toLowerCase().includes(q))) return;
+
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.innerHTML = `
+          <div class="order-meta">
+            <div>
+              <strong>${order.customerName}</strong> — <small>${order.time}</small><br>
+              <small>📍 Villa: ${order.customerVilla}</small><br>
+              <small>Delivery: ${order.deliveryText} — ${order.deliveryCost} LE</small>
+            </div>
+            <div style="text-align:right;">
+              <div><b>Total:</b> ${order.total} LE</div>
+              <div id="eta-${realIdx}" style="margin-top:8px;font-weight:700;color:#c44;"></div>
+              <div class="order-actions" style="margin-top:8px;"></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;"><b>Items:</b> ${order.items.map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+        `;
+        list.appendChild(card);
+
+        const actionsEl = card.querySelector('.order-actions');
+
+        const procBtn = document.createElement('button');
+        procBtn.className = 'process';
+        procBtn.textContent = order.processed ? '✅ Delivered' : 'Mark Delivered';
+        procBtn.onclick = () => { toggleProcessed(realIdx); renderOrdersForAdmin(); };
+        actionsEl.appendChild(procBtn);
+
+        const msgBtn = document.createElement('button');
+        msgBtn.className = 'msg-btn';
+        msgBtn.textContent = 'Message';
+        msgBtn.onclick = () => {
+          const text = prompt(`Send message to ${order.customerName} (Villa ${order.customerVilla}):`);
+          if (!text) return;
+          sendMessageToCustomer(order.customerName, order.customerVilla, text);
+          alert('Message sent.');
+        };
+        actionsEl.appendChild(msgBtn);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => { if (confirm('Delete this order?')) { deleteOrder(realIdx); renderOrdersForAdmin(); } };
+        actionsEl.appendChild(delBtn);
+      });
+
+      updateAllOrderTimers();
+    }
+
+    // Helpers same as earlier
+    function toggleProcessed(index) {
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]'); if (!orders[index]) return;
+      orders[index].processed = !orders[index].processed; localStorage.setItem('orders', JSON.stringify(orders));
+    }
+    function deleteOrder(index) {
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]'); orders.splice(index,1); localStorage.setItem('orders', JSON.stringify(orders));
+    }
+
+    // timer updates for admin orders
+    function updateAllOrderTimers() {
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+      orders.forEach((order, idx) => {
+        const remEl = document.getElementById(`eta-${idx}`);
+        if (!remEl) return;
+        const now = Date.now();
+        const eta = new Date(order.eta).getTime();
+        const diff = eta - now;
+        if (diff <= 0) remEl.textContent = 'Delivered / Time passed';
+        else {
+          const m = Math.floor(diff / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          remEl.textContent = `ETA: ${m}m ${s}s`;
+        }
+      });
+      setTimeout(updateAllOrderTimers, 1000);
+    }
+
+    // send targeted message: stores in 'rahawan_messages'
+    function sendMessageToCustomer(name, villa, text) {
+      const msgs = JSON.parse(localStorage.getItem('rahawan_messages') || '[]');
+      const msg = { id: Date.now(), name, villa, text, time: new Date().toLocaleString() };
+      msgs.push(msg);
+      localStorage.setItem('rahawan_messages', JSON.stringify(msgs));
+      // storage event will notify buyer tabs
+    }
+
+    // initial
+    updateShopStateText();
+    renderOrdersForAdmin();
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'orders' || e.key === 'isOpen') {
+        updateShopStateText();
+        renderOrdersForAdmin();
+      }
+    });
+  </script>
+</body>
+</html>

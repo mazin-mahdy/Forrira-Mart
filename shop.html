@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forrira - Shop</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Forrira</h1>
+        <h2>In Nakhel</h2>
+      </div>
+      <div class="header-right">
+        <div id="welcomeSmall" class="welcome-small"></div>
+        <button class="cart-btn" onclick="toggleCart()">🛒 Cart <span id="cartCount">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="top-controls">
+    <input type="text" id="searchBox" placeholder="Search snacks..." onkeyup="filterItems()" />
+    <select id="categoryFilter" onchange="filterItems()">
+      <option value="all">All Categories</option>
+      <option value="chips">Chips</option>
+      <option value="drinks">Drinks</option>
+      <option value="chocolate">Chocolate</option>
+      <option value="biscuits">Biscuits</option>
+    </select>
+  </div>
+
+  <section class="menu" id="menu">
+    <!-- Items (Chips) -->
+    <div class="item chips" data-name="Chipsy Tomato"><img src="images/tomato ch.png" alt=""><h3>Chipsy Tomato</h3><p>15 LE</p><button onclick="addToCart('Chipsy Tomato',15,'images/tomato ch.png')">Add</button></div>
+    <div class="item chips" data-name="Chipsy Kebab"><img src="images/kebab ch.png" alt=""><h3>Chipsy Kebab</h3><p>15 LE</p><button onclick="addToCart('Chipsy Kebab',15,'images/kebab ch.png')">Add</button></div>
+    <div class="item chips" data-name="Chipsy Cheese and Onion"><img src="images/cheese and onion ch.png" alt=""><h3>Chipsy Cheese & Onion</h3><p>15 LE</p><button onclick="addToCart('Chipsy Cheese and Onion',15,'images/cheese and onion ch.png')">Add</button></div>
+    <div class="item chips" data-name="Chipsy Salt"><img src="images/salt ch.png" alt=""><h3>Chipsy Salt</h3><p>15 LE</p><button onclick="addToCart('Chipsy Salt',15,'images/salt ch.png')">Add</button></div>
+    <div class="item chips" data-name="Chipsy Lemon & Chili"><img src="images/lemon ch.png" alt=""><h3>Chipsy Lemon & Chili</h3><p>15 LE</p><button onclick="addToCart('Chipsy Lemon & Chili',15,'images/lemon ch.png')">Add</button></div>
+
+    <!-- Chocolate -->
+    <div class="item chocolate" data-name="KitKat"><img src="chocolate/kitkat.png" alt=""><h3>KitKat</h3><p>30 LE</p><button onclick="addToCart('KitKat',30,'chocolate/kitkat.png')">Add</button></div>
+    <div class="item chocolate" data-name="Galaxy"><img src="chocolate/galaxy.png" alt=""><h3>Galaxy</h3><p>30 LE</p><button onclick="addToCart('Galaxy',30,'chocolate/galaxy.png')">Add</button></div>
+    <div class="item chocolate" data-name="Twix"><img src="chocolate/twix.png" alt=""><h3>Twix</h3><p>30 LE</p><button onclick="addToCart('Twix',30,'chocolate/twix.png')">Add</button></div>
+    <div class="item chocolate" data-name="Snickers"><img src="chocolate/snickers.png" alt=""><h3>Snickers</h3><p>30 LE</p><button onclick="addToCart('Snickers',30,'chocolate/snickers.png')">Add</button></div>
+    <div class="item chocolate" data-name="Cadbury Dairy Milk"><img src="chocolate/dairy milk.png" alt=""><h3>Cadbury Dairy Milk</h3><p>30 LE</p><button onclick="addToCart('Cadbury Dairy Milk',30,'chocolate/dairy milk.png')">Add</button></div>
+
+    <!-- Drinks -->
+    <div class="item drinks" data-name="7up"><img src="drinks/7up.png" alt=""><h3>7up</h3><p>15 LE</p><button onclick="addToCart('7up',15,'drinks/7up.png')">Add</button></div>
+    <div class="item drinks" data-name="CocaCola"><img src="drinks/coca.png" alt=""><h3>CocaCola</h3><p>15 LE</p><button onclick="addToCart('CocaCola',15,'drinks/coca.png')">Add</button></div>
+    <div class="item drinks" data-name="Pepsi"><img src="drinks/pepsi.png" alt=""><h3>Pepsi</h3><p>15 LE</p><button onclick="addToCart('Pepsi',15,'drinks/pepsi.png')">Add</button></div>
+    <div class="item drinks" data-name="Fury"><img src="drinks/fury.png" alt=""><h3>Fury</h3><p>20 LE</p><button onclick="addToCart('Fury',20,'drinks/fury.png')">Add</button></div>
+
+    <!-- Biscuits -->
+    <div class="item biscuits" data-name="Oreo"><img src="biscuits/oreo.png" alt=""><h3>Oreo</h3><p>15 LE</p><button onclick="addToCart('Oreo',15,'biscuits/oreo.png')">Add</button></div>
+    <div class="item biscuits" data-name="Tudo"><img src="biscuits/tudo.png" alt=""><h3>Tudo</h3><p>15 LE</p><button onclick="addToCart('Tudo',15,'biscuits/tudo.png')">Add</button></div>
+    <div class="item biscuits" data-name="Hohos"><img src="biscuits/hohos.png" alt=""><h3>Hohos</h3><p>15 LE</p><button onclick="addToCart('Hohos',15,'biscuits/hohos.png')">Add</button></div>
+    <div class="item biscuits" data-name="Molto"><img src="biscuits/molto.png" alt=""><h3>Molto</h3><p>20 LE</p><button onclick="addToCart('Molto',20,'biscuits/molto.png')">Add</button></div>
+  </section>
+
+  <!-- Big cart panel -->
+  <div id="bigCart" class="big-cart">
+    <div class="big-cart-header">
+      <h3>Your Cart</h3>
+      <button class="close-x" onclick="toggleCart()">✖</button>
+    </div>
+    <div id="bigCartItems" class="big-cart-items"></div>
+    <div class="big-cart-footer">
+      <div class="totals">
+        <div>Subtotal: <span id="subtotal">0</span> LE</div>
+        <div>Delivery: <span id="deliveryPreview">-</span></div>
+        <div class="grand">Total: <span id="grandTotal">0</span> LE</div>
+      </div>
+      <div class="cart-actions">
+        <button onclick="clearCart()" class="btn-secondary">Clear</button>
+        <button onclick="goToOrderPage()" class="btn-primary">Checkout →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="closedOverlay" class="closed-overlay">
+    <h1>❌ Sorry, Forrira is closed right now. Please check again later.</h1>
+  </div>
+
+  <div id="popupMsg" class="popup-msg" style="display:none;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

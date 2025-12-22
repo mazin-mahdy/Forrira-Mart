@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Enter Forrira</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .center-box {
+      max-width:420px;
+      margin:80px auto;
+      background:white;
+      padding:26px;
+      border-radius:14px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.08);
+      text-align:center;
+    }
+    .center-box h2 { margin:0 0 12px; color:#0aa3d6; }
+    .center-box input { width:92%; margin:10px 0; padding:12px; border-radius:10px; border:1px solid #ddd; font-size:16px; }
+    .center-box button { margin-top:12px; width:95%; padding:12px; background:#007bc2; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700; }
+    small.note { color:#666; display:block; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="center-box">
+    <h2>Welcome to Forrira — In Nakhel</h2>
+    <p>Enter your name and villa/house number to start ordering.</p>
+    <input id="custName" type="text" placeholder="Your name (e.g. Mazin)" />
+    <input id="custVilla" type="text" placeholder="Villa / House number (Nakhel only)" />
+    <button onclick="enterShop()">Enter Forrira</button>
+    <p id="err" style="display:none;color:#c33;margin-top:8px;">Please enter both name and villa number.</p>
+  </div>
+
+  <script>
+    function enterShop() {
+      const name = document.getElementById('custName').value.trim();
+      const villa = document.getElementById('custVilla').value.trim();
+      if (!name || !villa) {
+        document.getElementById('err').style.display = 'block';
+        return;
+      }
+      localStorage.setItem('customerName', name);
+      localStorage.setItem('customerVilla', villa);
+      localStorage.removeItem('currentCart'); // reset temporary cart
+      window.location.href = 'shop.html';
+    }
+  </script>
+</body>
+</html>
